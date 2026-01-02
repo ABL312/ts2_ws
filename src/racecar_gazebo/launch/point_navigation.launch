@@ -45,5 +45,5 @@
     <param name="goal_tolerance" value="0.3"/>
   </node>
 
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find racecar_gazebo)/config/racecar.rviz"/>
+  
 </launch>

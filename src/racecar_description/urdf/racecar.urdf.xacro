@@ -96,16 +96,7 @@
                     outer_rad * outer_rad) / 2}"/>
     </inertial>
   </xacro:macro>
-  <link name="imu_link">
-    <inertial>
-      <origin xyz="0 0 0"/>
-      <mass value="0.01"/>
-      <inertia ixx="1e-5" ixy="0" ixz="0"
-              iyy="1e-5" iyz="0"
-              izz="1e-5"/>
-    </inertial>
-  </link>
-
+  
   <xacro:macro name="battery" params="prefix reflect">
     <joint name="chassis_to_${prefix}_battery" type="fixed">
       <parent link="chassis"/>

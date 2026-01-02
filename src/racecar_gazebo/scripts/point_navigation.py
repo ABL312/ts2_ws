@@ -33,7 +33,8 @@ class PointNavigation:
         self.cmd_vel_pub = rospy.Publisher('cmd_vel', Twist, queue_size=10)
 
         # 提供服务
-        self.set_goal_service = rospy.Service('set_goal', SetBool, self.set_goal_callback)
+        # [修正 1] 使用 '~' 前缀，使服务名为 /point_navigation_node/set_goal
+        self.set_goal_service = rospy.Service('~set_goal', SetBool, self.set_goal_callback)
 
         # 初始化目标点
         goal_x = rospy.get_param('~goal_x', 0.0)
@@ -107,15 +108,21 @@ class PointNavigation:
 
         # 检查前方扇形区域内的障碍物
         front_angles = 30  # 前方30度范围
+        if not self.laser_data.ranges:
+            return False
+            
         angle_increment = self.laser_data.angle_increment
         center_index = len(self.laser_data.ranges) // 2
-        start_index = int(center_index - front_angles / 2 / angle_increment)
-        end_index = int(center_index + front_angles / 2 / angle_increment)
+        start_index = int(center_index - math.radians(front_angles) / 2 / angle_increment)
+        end_index = int(center_index + math.radians(front_angles) / 2 / angle_increment)
 
         for i in range(start_index, end_index):
-            if 0 < i < len(self.laser_data.ranges):
-                if self.laser_data.ranges[i] < self.obstacle_threshold:
-                    return True
+            if 0 <= i < len(self.laser_data.ranges):
+                dist = self.laser_data.ranges[i]
+                # 过滤无效数据 (inf, nan)
+                if not math.isinf(dist) and not math.isnan(dist):
+                    if dist < self.obstacle_threshold:
+                        return True
 
         return False
 
@@ -148,13 +155,15 @@ class PointNavigation:
         # 计算速度
         cmd_vel = Twist()
 
-        # 角度控制
+        # [修正 2] 角度控制与速度耦合
         if abs(angle) > 0.1:
-            # 需要转向
+            # 需要转向：阿克曼结构必须有线速度才能转向
+            cmd_vel.linear.x = 0.5  # 设定一个恒定的转弯速度
             cmd_vel.angular.z = max(min(self.max_angular_speed * angle, self.max_angular_speed), -self.max_angular_speed)
         else:
-            # 角度差不多，可以前进
-            cmd_vel.linear.x = max(min(self.max_linear_speed * distance, self.max_linear_speed), 0.2)
+            # 角度对准后：全速前进，微调角度
+            cmd_vel.linear.x = max(min(self.max_linear_speed * distance, self.max_linear_speed), 0.0)
+            cmd_vel.angular.z = 0
 
         self.cmd_vel_pub.publish(cmd_vel)
 
