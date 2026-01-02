@@ -23,7 +23,6 @@
               joint_state_controller"/>
 
   <node name="drive_controller" pkg="racecar_gazebo" type="drive_controller.py" output="screen">
-    <remap from="cmd_vel" to="/racecar/drive_cmd"/>
   </node>
 
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
@@ -37,7 +36,6 @@
   </node>
 
   <node name="point_navigation_node" pkg="racecar_gazebo" type="point_navigation.py" output="screen">
-    <remap from="cmd_vel" to="/racecar/drive_cmd"/>
     <remap from="odom" to="/odom"/> 
     <remap from="scan" to="/scan"/>
     <param name="goal_x" value="5.0"/>
@@ -45,5 +43,4 @@
     <param name="goal_tolerance" value="0.3"/>
   </node>
 
-  
 </launch>
