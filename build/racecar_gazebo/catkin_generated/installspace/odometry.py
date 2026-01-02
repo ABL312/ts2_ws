@@ -77,17 +77,17 @@ class OdometryPublisher:
 
             # 发布TF变换
             if self.publish_tf:
-                transform = TransformStamped()
-                transform.header.stamp = rospy.Time.now()
-                transform.header.frame_id = self.odom_frame
-                transform.child_frame_id = self.base_frame
+                self.tf_broadcaster.sendTransform(
+                    (pose.position.x, pose.position.y, pose.position.z),
+                    (pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w),
+                    rospy.Time.now(),
+                    self.base_frame,    # child frame
+                    self.odom_frame     # parent frame
+                )
 
-                transform.transform.translation.x = pose.position.x
-                transform.transform.translation.y = pose.position.y
-                transform.transform.translation.z = pose.position.z
-                transform.transform.rotation = pose.orientation
+              
 
-                self.tf_broadcaster.sendTransformMessage(transform)
+
 
         except (ValueError, IndexError):
             # 如果找不到机器人模型，忽略
