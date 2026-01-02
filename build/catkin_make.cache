@@ -1,0 +1,2 @@
+racecar_description:racecar_gazebo
+-DCATKIN_DEVEL_PREFIX=/home/tostar/ts2_ws/devel -DCMAKE_INSTALL_PREFIX=/home/tostar/ts2_ws/install -G Unix Makefiles
