@@ -46,19 +46,23 @@ class DriveController:
         right_wheel_speed = (linear_vel + angular_vel * self.wheel_base / 2) / self.wheel_radius
 
         # 限制轮速
-        max_wheel_speed = 10.0  # 最大轮速 (rad/s)
+        max_wheel_speed = 35.0  # 最大轮速 (rad/s)
         left_wheel_speed = max(min(left_wheel_speed, max_wheel_speed), -max_wheel_speed)
         right_wheel_speed = max(min(right_wheel_speed, max_wheel_speed), -max_wheel_speed)
 
         return left_wheel_speed, right_wheel_speed
 
     def calculate_steering_angles(self):
-        """计算转向角度"""
-        # 获取角速度
+        """计算转向角度 - 使用阿克曼转向几何"""
+        linear_vel = self.current_cmd.linear.x
         angular_vel = self.current_cmd.angular.z
 
-        # 计算转向角度
-        steering_angle = angular_vel * 0.5  # 简化的转向计算
+        # 避免除以零
+        if abs(linear_vel) < 0.01:
+            return 0.0
+
+        # 正确公式: delta = atan(L * omega / v)
+        steering_angle = math.atan(self.wheel_base * angular_vel / linear_vel)
 
         # 限制转向角度
         steering_angle = max(min(steering_angle, self.max_steering_angle), -self.max_steering_angle)
