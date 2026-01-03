@@ -11,7 +11,7 @@ from gazebo_msgs.msg import ModelStates
 
 class OdometryPublisher:
     def __init__(self):
-        rospy.init_node('racecar_odometry', anonymous=True)
+        rospy.init_node('racecar_odometry', anonymous=False)
 
         # 参数
         self.robot_name = rospy.get_param('~robot_name', 'racecar')

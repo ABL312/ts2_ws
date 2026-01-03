@@ -53,23 +53,7 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/racecar_gazebo" TYPE PROGRAM FILES "/home/tostar/ts2_ws/build/racecar_gazebo/catkin_generated/installspace/point_navigation.py")
-endif()
-
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/racecar_gazebo" TYPE PROGRAM FILES "/home/tostar/ts2_ws/build/racecar_gazebo/catkin_generated/installspace/odometry.py")
-endif()
-
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/racecar_gazebo" TYPE PROGRAM FILES "/home/tostar/ts2_ws/build/racecar_gazebo/catkin_generated/installspace/set_goal.py")
-endif()
-
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/racecar_gazebo" TYPE PROGRAM FILES "/home/tostar/ts2_ws/build/racecar_gazebo/catkin_generated/installspace/laser_avoidance.py")
-endif()
-
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/racecar_gazebo" TYPE PROGRAM FILES "/home/tostar/ts2_ws/build/racecar_gazebo/catkin_generated/installspace/velocity_mixer.py")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)

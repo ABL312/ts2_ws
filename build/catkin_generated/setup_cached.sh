@@ -7,4 +7,6 @@
 # new environment variables
 
 # modified environment variables
+export LD_LIBRARY_PATH='/home/tostar/learning/devel/lib:/home/tostar/map_ws/devel/lib:/home/tostar/catkin_ws/devel/lib:/opt/ros/noetic/lib'
+export PKG_CONFIG_PATH='/home/tostar/learning/devel/lib/pkgconfig:/home/tostar/map_ws/devel/lib/pkgconfig:/home/tostar/catkin_ws/devel/lib/pkgconfig:/opt/ros/noetic/lib/pkgconfig'
 export PWD='/home/tostar/ts2_ws/build'
