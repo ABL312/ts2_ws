@@ -2,8 +2,8 @@ global_costmap:
   global_frame: map
   robot_base_frame: base_footprint
   update_frequency: 1.0
-  static_map: true       # 关键：不使用静态地图
-  rolling_window: false    # 关键：地图跟随机器人移动
+  static_map: true       
+  rolling_window: false    
   
   
   # 明确指定插件，修复警告
