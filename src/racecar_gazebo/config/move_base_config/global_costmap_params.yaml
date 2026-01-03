@@ -1,13 +1,10 @@
 global_costmap:
-  global_frame: odom
+  global_frame: map
   robot_base_frame: base_footprint
-  update_frequency: 2.0
-  publish_frequency: 1.0
-  static_map: false       # 关键：不使用静态地图
-  rolling_window: true    # 关键：地图跟随机器人移动
-  width: 30.0
-  height: 30.0
-  resolution: 0.05
+  update_frequency: 1.0
+  static_map: true       # 关键：不使用静态地图
+  rolling_window: false    # 关键：地图跟随机器人移动
+  
   
   # 明确指定插件，修复警告
   plugins:

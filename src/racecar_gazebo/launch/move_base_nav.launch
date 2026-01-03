@@ -6,6 +6,8 @@
     <arg name="use_sim_time" value="true"/>
     <arg name="gui" value="true"/>
   </include>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(find racecar_gazebo)/map/racecar_runway.yaml" />
+  <include file="$(find racecar_gazebo)/launch/amcl.launch" />
 
   <param name="robot_description" command="$(find xacro)/xacro $(find racecar_description)/urdf/racecar.urdf.xacro"/>
   <node name="spawn_racecar" pkg="gazebo_ros" type="spawn_model" output="screen"
@@ -40,6 +42,7 @@
     
     <remap from="cmd_vel" to="/cmd_vel"/>
   </node>
+  
   
   <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find racecar_gazebo)/config/racecar.rviz" required="true" /> -->
 
