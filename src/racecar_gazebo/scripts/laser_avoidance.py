@@ -2,144 +2,76 @@
 # -*- coding: utf-8 -*-
 
 import rospy
-import math
-import numpy as np
-from geometry_msgs.msg import Twist
 from sensor_msgs.msg import LaserScan
-from std_srvs.srv import SetBool, SetBoolResponse
+from geometry_msgs.msg import Twist
+import math
 
 class LaserAvoidance:
     def __init__(self):
-        rospy.init_node('laser_avoidance_node', anonymous=True)
+        # 1. 初始化节点
+        rospy.init_node('laser_avoidance_node')
+        
+        # 2. 订阅激光雷达话题 /scan
+        self.scan_sub = rospy.Subscriber('/scan', LaserScan, self.scan_callback)
+        
+        # 3. 发布速度控制话题 /cmd_vel (配合您之前修改的 launch 文件，不使用重映射)
+        self.cmd_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
+        
+        # 避障参数设置
+        self.safety_distance = 0.8  # 触发避障的距离阈值 (米)
+        self.linear_speed = 0.5     # 直行速度 (m/s)
+        self.turn_speed = 0.5       # 转向时的角速度 (rad/s) [Racecar的转向其实是舵机角度]
+        
+        rospy.loginfo("Laser Avoidance Node Started. Waiting for scan data...")
 
-        # 初始化参数
-        self.max_linear_speed = rospy.get_param('~max_linear_speed', 1.0)  # 最大线速度
-        self.max_angular_speed = rospy.get_param('~max_angular_speed', 1.0)  # 最大角速度
-        self.obstacle_threshold = rospy.get_param('~obstacle_threshold', 0.5)  # 障碍物检测阈值
-        self.safety_distance = rospy.get_param('~safety_distance', 0.3)  # 安全距离
-        self.detection_angle = rospy.get_param('~detection_angle', 90)  # 检测角度范围（度）
-
-        # 当前状态
-        self.laser_data = None
-        self.is_active = False
-
-        # 订阅话题
-        rospy.Subscriber('scan', LaserScan, self.laser_callback)
-
-        # 发布话题
-        self.cmd_vel_pub = rospy.Publisher('cmd_vel', Twist, queue_size=10)
-
-        # 提供服务
-        self.toggle_service = rospy.Service('toggle_avoidance', SetBool, self.toggle_callback)
-
-        rospy.loginfo("Laser Avoidance Node Initialized")
-
-    def laser_callback(self, msg):
-        """处理激光雷达数据"""
-        self.laser_data = msg
-
-    def toggle_callback(self, req):
-        """切换避障功能"""
-        self.is_active = req.data
-        if req.data:
-            rospy.loginfo("Laser avoidance activated")
-            return SetBoolResponse(success=True, message="Laser avoidance activated")
+    def scan_callback(self, msg):
+        # 激光雷达通常有数百个点 (msg.ranges)
+        # 假设雷达是水平安装，数组中间的索引对应正前方 (0度)
+        
+        num_readings = len(msg.ranges)
+        mid_index = int(num_readings / 2)
+        
+        # 取中间一部分范围作为“正前方”检测区
+        # 例如：如果总共720个点，我们取中间120个点 (约30度范围)
+        window_size = int(num_readings / 6) 
+        start_index = mid_index - window_size
+        end_index = mid_index + window_size
+        
+        # 获取前方扇区的数据
+        front_ranges = msg.ranges[start_index : end_index]
+        
+        # 数据清洗：过滤掉 inf (无穷大) 和 nan (无效值)，以及距离过近的噪点
+        valid_ranges = []
+        for r in front_ranges:
+            if not math.isinf(r) and not math.isnan(r) and r > 0.05:
+                valid_ranges.append(r)
+        
+        # 如果没有有效数据，假设前方空旷
+        if len(valid_ranges) == 0:
+            min_dist = float('inf')
         else:
-            rospy.loginfo("Laser avoidance deactivated")
-            return SetBoolResponse(success=True, message="Laser avoidance deactivated")
+            min_dist = min(valid_ranges) # 找到前方最近的障碍物距离
 
-    def find_best_direction(self):
-        """找到最佳前进方向"""
-        if self.laser_data is None:
-            return 0.0, 0.0
-
-        # 将激光雷达数据转换为直方图
-        angle_increment = self.laser_data.angle_increment
-        num_readings = len(self.laser_data.ranges)
-
-        # 计算检测范围
-        detection_rad = math.radians(self.detection_angle)
-        start_angle = -detection_rad / 2
-        end_angle = detection_rad / 2
-
-        # 创建直方图
-        histogram = np.zeros(num_readings)
-
-        for i in range(num_readings):
-            angle = self.laser_data.angle_min + i * angle_increment
-
-            # 只考虑检测范围内的数据
-            if start_angle <= angle <= end_angle:
-                # 无效距离值设为0
-                if self.laser_data.ranges[i] == float('inf') or math.isnan(self.laser_data.ranges[i]):
-                    histogram[i] = 0
-                else:
-                    # 距离越远，权重越高
-                    histogram[i] = self.laser_data.ranges[i]
-
-        # 找到最佳方向
-        best_index = np.argmax(histogram)
-        best_angle = self.laser_data.angle_min + best_index * angle_increment
-        best_distance = histogram[best_index]
-
-        return best_angle, best_distance
-
-    def calculate_velocity(self):
-        """计算速度"""
-        if not self.is_active or self.laser_data is None:
-            # 停止移动
-            cmd_vel = Twist()
-            return cmd_vel
-
-        # 检测前方障碍物
-        front_clear = True
-        front_threshold = self.obstacle_threshold
-
-        # 检查前方区域
-        center_index = len(self.laser_data.ranges) // 2
-        front_range = int(math.radians(30) / self.laser_data.angle_increment)  # 前方30度
-
-        for i in range(center_index - front_range, center_index + front_range):
-            if 0 <= i < len(self.laser_data.ranges):
-                if self.laser_data.ranges[i] < front_threshold:
-                    front_clear = False
-                    break
-
-        cmd_vel = Twist()
-
-        if front_clear:
-            # 前方无障碍物，可以前进
-            best_angle, best_distance = self.find_best_direction()
-
-            # 计算线速度
-            linear_speed = min(self.max_linear_speed, best_distance * 0.5)
-            cmd_vel.linear.x = linear_speed
-
-            # 计算角速度
-            angular_speed = max(min(best_angle * 2.0, self.max_angular_speed), -self.max_angular_speed)
-            cmd_vel.angular.z = angular_speed
+        # --- 核心避障逻辑 ---
+        twist = Twist()
+        
+        if min_dist < self.safety_distance:
+            # 情况A: 障碍物太近 -> 避障
+            rospy.logwarn(f"Obstacle detected! Distance: {min_dist:.2f}m -> Turning Left")
+            twist.linear.x = 0.0          # 可以选择减速或停车
+            twist.angular.z = self.turn_speed  # 向左转 (正值为左，负值为右)
         else:
-            # 前方有障碍物，需要转向
-            best_angle, _ = self.find_best_direction()
-
-            # 只转向，不前进
-            angular_speed = max(min(best_angle * 3.0, self.max_angular_speed), -self.max_angular_speed)
-            cmd_vel.angular.z = angular_speed
-
-        return cmd_vel
-
-    def run(self):
-        """主循环"""
-        rate = rospy.Rate(10)  # 10Hz
-
-        while not rospy.is_shutdown():
-            cmd_vel = self.calculate_velocity()
-            self.cmd_vel_pub.publish(cmd_vel)
-            rate.sleep()
+            # 情况B: 前方安全 -> 直行
+            # rospy.loginfo_throttle(1, f"Path clear. Distance: {min_dist:.2f}m")
+            twist.linear.x = self.linear_speed
+            twist.angular.z = 0.0
+            
+        # 发布指令
+        self.cmd_pub.publish(twist)
 
 if __name__ == '__main__':
     try:
-        avoidance = LaserAvoidance()
-        avoidance.run()
+        node = LaserAvoidance()
+        rospy.spin()
     except rospy.ROSInterruptException:
         pass
