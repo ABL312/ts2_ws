@@ -1,9 +1,15 @@
 global_costmap:
   global_frame: odom
   robot_base_frame: base_footprint
-  update_frequency: 5.0
-  static_map: false
-  rolling_window: true
-  width: 20.0
-  height: 20.0
+  update_frequency: 2.0
+  publish_frequency: 1.0
+  static_map: false       # 关键：不使用静态地图
+  rolling_window: true    # 关键：地图跟随机器人移动
+  width: 30.0
+  height: 30.0
   resolution: 0.05
+  
+  # 明确指定插件，修复警告
+  plugins:
+    - {name: obstacle_layer, type: "costmap_2d::ObstacleLayer"}
+    - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
