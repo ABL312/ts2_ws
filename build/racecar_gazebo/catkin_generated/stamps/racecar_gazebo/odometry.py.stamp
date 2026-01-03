@@ -11,7 +11,7 @@ from gazebo_msgs.msg import ModelStates
 
 class OdometryPublisher:
     def __init__(self):
-        rospy.init_node('racecar_odometry', anonymous=True)
+        rospy.init_node('racecar_odometry', anonymous=False)
 
         # 参数
         self.robot_name = rospy.get_param('~robot_name', 'racecar')
@@ -35,10 +35,17 @@ class OdometryPublisher:
         self.last_y = 0.0
         self.last_yaw = 0.0
 
+        self.last_time = rospy.Time.now()
+        self.publish_interval = rospy.Duration(0.05)
+
         rospy.loginfo("Odometry Publisher Initialized")
 
     def model_states_callback(self, msg):
         """处理模型状态消息"""
+        current_time = rospy.Time.now()
+        if (current_time - self.last_time) < self.publish_interval:
+            return
+        self.last_time = current_time
         try:
             # 找到机器人模型
             index = msg.name.index(self.robot_name)

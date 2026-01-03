@@ -19,7 +19,7 @@ class DriveController:
         self.current_cmd = Twist()
 
         # 订阅话题
-        rospy.Subscriber('cmd_vel', Twist, self.cmd_callback)
+        rospy.Subscriber('/cmd_vel', Twist, self.cmd_callback)
 
         # 发布话题
         self.left_rear_wheel_pub = rospy.Publisher('/racecar/left_rear_wheel_velocity_controller/command', Float64, queue_size=10)
