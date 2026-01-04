@@ -15,4 +15,4 @@ obstacle_layer:
 inflation_layer:
   enabled: true
   cost_scaling_factor: 3.0  # 越大越陡，障碍物周围的危险区越小
-  inflation_radius: 0.6
+  inflation_radius: 0.4

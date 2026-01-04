@@ -3,13 +3,15 @@ global_costmap:
   robot_base_frame: base_footprint
   update_frequency: 1.0
   publish_frequency: 1.0
-  static_map: true       
+  
+  # 必须使用静态地图
+  static_map: true
   rolling_window: false
-  resolution: 0.05
-  transform_tolerance: 1.0    
   
-  
-  # 明确指定插件，修复警告
+  # 请删除 origin_x, origin_y, width, height 这些参数（如果有的话）
+  # 因为 static_map: true 时，尺寸由上面的 yaml 文件决定
+
   plugins:
-    - {name: obstacle_layer, type: "costmap_2d::ObstacleLayer"}
-    - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
+    - {name: static_layer,            type: "costmap_2d::StaticLayer"}
+    - {name: obstacle_layer,          type: "costmap_2d::ObstacleLayer"}
+    - {name: inflation_layer,         type: "costmap_2d::InflationLayer"}

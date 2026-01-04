@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "/home/tostar/ts2_ws/src/racecar_description"
+    "cmake.sourceDirectory": "/home/tostar/ts2_ws/src/racecar_description",
+    "ROS2.distro": "noetic"
 }
