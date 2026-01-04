@@ -2,7 +2,7 @@
 <launch>
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find racecar_gazebo)/worlds/racecar_runway.world"/>
-    <arg name="paused" value="false"/>
+    <arg name="paused" value="true"/>
     <arg name="use_sim_time" value="true"/>
     <arg name="gui" value="true"/>
   </include>
@@ -49,6 +49,9 @@
     <rosparam file="$(find racecar_gazebo)/config/move_base_config/base_local_planner_params.yaml" command="load" />
     
     <remap from="cmd_vel" to="/cmd_vel"/>
+    
   </node>
+  <node pkg="rviz" type="rviz" name="rviz" required="true" 
+      args="-d $(find racecar_gazebo)/rviz/rviz.rviz"/>
 
   </launch>

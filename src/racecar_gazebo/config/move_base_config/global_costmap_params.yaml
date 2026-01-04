@@ -8,8 +8,7 @@ global_costmap:
   static_map: true
   rolling_window: false
   
-  # 请删除 origin_x, origin_y, width, height 这些参数（如果有的话）
-  # 因为 static_map: true 时，尺寸由上面的 yaml 文件决定
+
 
   plugins:
     - {name: static_layer,            type: "costmap_2d::StaticLayer"}
