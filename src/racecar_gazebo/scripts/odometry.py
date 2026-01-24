@@ -91,11 +91,6 @@ class OdometryPublisher:
                     self.base_frame,    # child frame
                     self.odom_frame     # parent frame
                 )
-
-              
-
-
-
         except (ValueError, IndexError):
             # 如果找不到机器人模型，忽略
             pass
@@ -110,3 +105,8 @@ if __name__ == '__main__':
         odom_publisher.run()
     except rospy.ROSInterruptException:
         pass
+
+              
+
+
+

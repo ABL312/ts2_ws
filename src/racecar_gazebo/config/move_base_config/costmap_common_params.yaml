@@ -14,5 +14,5 @@ obstacle_layer:
 # 膨胀层参数 (对应 plugins 里的 name: inflation_layer)
 inflation_layer:
   enabled: true
-  cost_scaling_factor: 18.0  
-  inflation_radius: 0.75
+  cost_scaling_factor: 7.50  
+  inflation_radius: 0.35

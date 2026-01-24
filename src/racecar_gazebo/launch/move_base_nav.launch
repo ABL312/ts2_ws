@@ -45,13 +45,13 @@
     <rosparam file="$(find racecar_gazebo)/config/move_base_config/costmap_common_params.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find racecar_gazebo)/config/move_base_config/local_costmap_params.yaml" command="load" />
     <rosparam file="$(find racecar_gazebo)/config/move_base_config/global_costmap_params.yaml" command="load" />
-    
     <rosparam file="$(find racecar_gazebo)/config/move_base_config/base_local_planner_params.yaml" command="load" />
-    
     <remap from="cmd_vel" to="/cmd_vel"/>
-    
   </node>
   <node pkg="rviz" type="rviz" name="rviz" required="true" 
       args="-d $(find racecar_gazebo)/rviz/rviz.rviz"/>
 
   </launch>
+    
+    
+    

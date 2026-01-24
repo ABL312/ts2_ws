@@ -3,14 +3,13 @@ global_costmap:
   robot_base_frame: base_footprint
   update_frequency: 1.0
   publish_frequency: 1.0
-  
   # 必须使用静态地图
   static_map: true
   rolling_window: false
-  
-
-
   plugins:
     - {name: static_layer,            type: "costmap_2d::StaticLayer"}
     - {name: obstacle_layer,          type: "costmap_2d::ObstacleLayer"}
     - {name: inflation_layer,         type: "costmap_2d::InflationLayer"}
+  
+  
+

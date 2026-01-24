@@ -8,6 +8,9 @@ TrajectoryPlannerROS:
   sim_granularity: 0.025
   vx_samples: 10
   vtheta_samples: 20
+  yaw_goal_tolerance: 0.5
+  xy_goal_tolerance: 0.1
+  latch_xy_goal_tolerance: true
 
   acc_lim_theta: 2.3
   acc_lim_x: 1.3
