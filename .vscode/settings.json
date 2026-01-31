@@ -1,5 +1,6 @@
 {
     "cmake.sourceDirectory": "/home/tostar/ts2_ws/src/racecar_description",
     "ROS2.distro": "noetic",
-    "github.copilot.chat.codeGeneration.useInstructionFiles": true
+    "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+    "Codegeex.RepoIndex": true
 }

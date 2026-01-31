@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<launch>
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find racecar_gazebo)/worlds/racecar_runway.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+  </include>
+
+  <param name="robot_description" command="$(find xacro)/xacro $(find racecar_description)/urdf/racecar.urdf.xacro"/>
+
+  <node name="spawn_racecar" pkg="gazebo_ros" type="spawn_model" output="screen"
+        args="-urdf -param robot_description -model racecar -x 0 -y 0 -z 0.05"/>
+
+  <rosparam file="$(find racecar_gazebo)/config/racecar_control.yaml" command="load"/>
+
+  <node name="controller_manager" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="/racecar"
+      args="left_rear_wheel_velocity_controller right_rear_wheel_velocity_controller
+            left_front_wheel_velocity_controller right_front_wheel_velocity_controller
+            left_steering_hinge_position_controller right_steering_hinge_position_controller
+            joint_state_controller"/>
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
+    <remap from="joint_states" to="/racecar/joint_states"/>
+  </node>
+
+  <node name="drive_controller" pkg="racecar_gazebo" type="drive_controller.py" output="screen">
+  </node>
+
+  <node name="obstacle_avoidance" pkg="racecar_gazebo" type="obstacle_avoidance.py" output="screen">
+  </node>
+
+  
+
+</launch>
